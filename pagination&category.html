@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+
+        }
+        body{
+            background-color: olive;
+        }
+        .container{
+            padding: 10px;
+        }
+        .container h1{
+            text-decoration: underline;
+            text-align: center;
+            padding: 10px;
+            color: white;
+
+        }
+        .productscontainer{
+            display: grid;
+            grid-template-columns: 1fr 5fr;
+        }
+        /* .productscontainer div{
+            border: 1px solid black;
+        } */
+
+        .cards{
+            display: grid;
+            grid-template-columns: repeat(4 , 1fr);
+            padding: 10px;
+           gap: 10px;
+        }
+        img{
+            width: 100%;
+            height: 100%;
+        }
+        .card{
+            background-color: whitesmoke;
+            border-radius: 8px;
+            padding: 10px;
+            overflow: hidden;
+        }
+        .card h2{
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .card p{
+            font-size: 17px;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .card div{
+            font-size: 17px;
+            font-weight: 600;
+        }
+        .card div span:nth-child(2){
+            text-decoration: line-through;
+            color: grey;
+        }
+        .card div span:nth-child(){
+          font-size: 19px;
+        }
+
+        .card div:last-child{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .card div:last-child button{
+            padding: 8px 0;
+        }
+
+        .pagination{
+            text-align: center;
+            padding: 20px 0;
+        }
+        .pagination button{
+            cursor: pointer;
+            background-color: black;
+            color: white;
+            border: 1px solid black;
+            font-size: 18px;
+            font-weight: 500;
+            padding: 8px 10px;
+            margin: 0  4px;
+
+        }
+        .pagination button:hover{
+            background-color: white;
+            color: black ;
+        }
+        .activepagination{
+            background-color: white;
+            color: black;
+          
+        }
+
+        .activebtn{
+          
+            background-color: white !important;
+            color: black !important;
+        }
+
+
+        
+    </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Products</h1>
+
+            <div class="productscontainer">
+                <div class="categories">
+                    <h2>Categories</h2>
+                    <ul class="categorybox">
+
+                    </ul>
+                </div>
+                <div class="cards">
+                    <!-- <div class="card">
+                        <figure class="thumbnail">
+                            <img
+                                src="https://cdn.dummyjson.com/products/images/beauty/Essence%20Mascara%20Lash%20Princess/thumbnail.png"
+                                alt>
+                        </figure>
+                        <h2>Essence Mascara Lash Princess</h2>
+                        <p>The Essence Mascara Lash Princess is a popular
+                            mascara known for its volumizing and lengthening
+                            effects. Achieve dramatic lashes with this
+                            long-lasting and cruelty-free formula</p>
+                        <div>
+                            <span> price : $ </span> <span>1000</span>
+                            <span>920</span>
+                        </div>
+                        <div>
+                            <button>Details</button>
+                            <button>Add to Cart</button>
+                        </div>
+                    </div> -->
+                </div>
+
+            </div>
+            <div class="pagination">
+
+
+            </div>
+        </div>
+        <script>
+            const cardContainer = document.querySelector('.cards');
+            const paginationCounter = document.querySelector('.pagination');
+            const catbox = document.querySelector('.categorybox ');
+            let allapidata;
+            fetch('https://dummyjson.com/products?limit=194')
+            .then(res => res.json())
+            .then((data)=>{
+                allapidata = data.products
+            });
+
+
+         
+
+            // let start = 1;
+            let limit = 12;
+            let currentpage = 1;
+
+
+            const url =`https://dummyjson.com/products?limit=${limit}&skip=${(currentpage - 1)* limit}`;
+
+            const showdata  = (products , pindex)=>{
+                     
+                let alldata ='';
+                products.forEach((products)=>{
+                    alldata += `<div class="card">
+                        <figure class="thumbnail">
+                            <img
+                                src="${products.thumbnail}"
+                                alt>
+                        </figure>
+                        <h2>${products.title}</h2>
+                        <p>${products.description}
+                            </p>
+                        <div>
+                            <span> price : $ </span> <span>1000</span>
+                            <span>920</span>
+                        </div>
+                        <div>
+                            <button id="detailsbtn" value="${pindex}">Details</button>
+                            <button id="addtocardbtn" value="${pindex}" >Add to Cart</button>
+                        </div>
+                    </div>`
+                });
+
+                cardContainer.innerHTML = alldata ;
+
+                const alladdtocartbtns = document.querySelectorAll('#addtocardbtn');
+
+                alladdtocartbtns.forEach((btn)=>{
+                    btn.addEventListener('click' , (e)=>{
+                        console.log(products[e.target.value].id);
+
+                        const cartdata  = JSON.parse(localStorage.getItem('wslc 250 2570')) || [];
+
+                        const cartobj = {
+                            id: products [e.target.value].id  ,
+                    products  :  products [e.target.value],
+                    quantity   : 1
+
+                        };
+
+                        cartdata.push(cardobj);
+
+                        localStorage.setItem('wslc 250 2570', JSON.stringify(carddata));
+                    })
+                });
+               
+
+            }
+
+            const fetchdata = async (apiUrl)=>{
+                const response = await fetch(apiUrl);
+
+                if(response.status === 200){
+
+                  const actualdata  = await response.json();
+
+                  showdata(actualdata.products);
+
+                  const totalpages =Math.ceil( actualdata.total / limit);
+
+                  console.log(totalpages);
+                  console.log(actualdata   );
+
+                  let totalbtns = '';
+                  for(let i =1 ; i <= totalpages ;i++){
+                    if(i === currentpage){
+                        totalbtns  += `<button class = "activebtn" value ="${i}">${i}</button>`;
+                    }
+
+                    else{
+                        totalbtns += `<button value ="${i}"> ${i}</button>`
+                    }
+                    
+
+                  
+
+                }
+                paginationCounter.innerHTML = totalbtns;
+        
+                       
+
+                const allpagebtns = document.querySelectorAll('.pagination button');
+
+                allpagebtns.forEach((btn)=>{
+                       btn.addEventListener('click',()=>{
+                               
+                       currentpage = Number(btn.value)
+
+                       fetchdata(`https://dummyjson.com/products?limit=${limit}&skip=${(currentpage - 1)* limit}`);
+                       })
+                });
+              
+ 
+                }
+                else{
+
+                   alert ('something went wrong');
+                }
+
+            };
+        
+            fetchdata(url);
+
+            const showcats = async ()=>{
+
+                let checkcats;
+           const catresponse =  await fetch ( 'https://dummyjson.com/products/categories' );
+           const  actualcategories = await catresponse.json();
+            
+           let allcategories = '';
+           actualcategories.forEach((category)=>{
+
+               
+            allcategories += `<li>
+            <input type = "checkbox" value ="${category.slug}">
+            <span> ${category.name}</span>  
+            </li>`;
+           });
+
+        catbox.innerHTML = allcategories;
+
+        allcheckboxes = document.querySelectorAll('.categorybox li input[type="checkbox"]');
+
+      allcheckboxes.forEach((inp)=>{
+        inp.addEventListener('click',(e)=>{
+             checkcats = [];
+
+            allcheckboxes.forEach((v)=>{
+                if(v.checked){
+                    checkcats.push(v.value.toLowerCase());
+                }
+            });
+                  
+          const checkeddata = allapidata.filter((singledata) => checkcats.includes(singledata.category));
+
+          if(checkcats.length === 0){
+            showdata(allapidata)
+          }
+          else{
+            showdata(checkeddata);
+          }
+          
+          
+            
+        });
+      });
+
+
+      
+            };
+
+            showcats();
+        </script>
+    </body>
+</html>  
